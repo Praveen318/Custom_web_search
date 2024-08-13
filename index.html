@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Web Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: auto; padding: 20px; }
+        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 10px; }
+        button { padding: 10px 20px; }
+        .results { margin-top: 20px; }
+        .result { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Custom Web Search</h1>
+        <input type="text" id="query" placeholder="Enter your search query">
+        <input type="text" id="websites" placeholder="Enter websites (comma-separated)">
+        <button onclick="performSearch()">Search</button>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        async function performSearch() {
+            const query = document.getElementById("query").value;
+            const websites = document.getElementById("websites").value.split(',');
+
+            const response = await fetch("/search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query, websites })
+            });
+
+            const data = await response.json();
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = '';
+
+            data.results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+                resultDiv.innerHTML = `
+                    <a href="${result.url}" target="_blank">${result.url}</a>
+                    <p>${result.summary}</p>
+                `;
+                resultsDiv.appendChild(resultDiv);
+            });
+        }
+    </script>
+</body>
+</html>
